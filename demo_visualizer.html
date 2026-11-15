@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulasi Visual Peringatan Dini Banjir Desa Rahong</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { display: flex; height: 100vh; background: #0d0714; color: #eae5d9; overflow: hidden; }
+    #sidebar { width: 440px; background: #1a0b2e; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; box-shadow: 4px 0 24px rgba(0,0,0,0.6); z-index: 1000; border-right: 1px solid #34234e; }
+    #map { flex: 1; height: 100%; background: #090d1a; }
+    h1 { font-size: 19px; font-weight: 800; color: #f3e5ab; display: flex; align-items: center; gap: 8px; letter-spacing: 0.4px; }
+    .subtitle { font-size: 12px; color: #afa3c4; margin-top: 2px; }
+    .card { background: #24123e; padding: 16px; border-radius: 14px; border: 1px solid #34234e; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .slider-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .slider-header { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; color: #afa3c4; }
+    input[type=range] { width: 100%; accent-color: #f3e5ab; cursor: pointer; }
+    .btn { background: #6b21a8; color: #f3e5ab; border: 1px solid #d4c38c; padding: 11px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px; }
+    .btn:hover { background: #7e22ce; box-shadow: 0 0 14px rgba(147, 51, 234, 0.4); }
+    .btn-secondary { background: #1a0b2e; color: #eae5d9; border: 1px solid #34234e; }
+    .btn-secondary:hover { background: #24123e; }
+    .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-weight: 800; font-size: 11px; letter-spacing: 0.4px; }
+    .badge-aman { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1.2px solid #10b981; }
+    .badge-waspada { background: rgba(243, 229, 171, 0.15); color: #f3e5ab; border: 1.2px solid #f3e5ab; }
+    .badge-siaga { background: rgba(249, 115, 22, 0.18); color: #f97316; border: 1.2px solid #f97316; }
+    .badge-awas { background: rgba(225, 29, 72, 0.2); color: #f43f5e; border: 1.2px solid #e11d48; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .zone-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #34234e; font-size: 13px; }
+    .zone-row:last-child { border-bottom: none; }
+    .alert-banner { display: none; padding: 14px 18px; border-radius: 12px; font-size: 13px; font-weight: 700; line-height: 1.45; border: 1.5px solid #f3e5ab; }
+  </style>
+</head>
+<body>
+
+  <div id="sidebar">
+    <div>
+      <h1>🌊 Peringatan Banjir Rahong</h1>
+      <div class="subtitle">Fuzzy Mamdani (12 Rules, COA) + Analisis Topografi Spasial</div>
+    </div>
+
+    <!-- Alert Box -->
+    <div id="alertBanner" class="alert-banner"></div>
+
+    <!-- Control Sliders -->
+    <div class="card">
+      <div style="font-weight: 700; font-size: 14px; margin-bottom: 12px; color: #e2e8f0;">⚙️ Kontrol Simulasi Cuaca</div>
+      
+      <div class="slider-group">
+        <div class="slider-header">
+          <span>Curah Hujan (mm)</span>
+          <span id="txtCurah" style="color: #38bdf8;">65 mm</span>
+        </div>
+        <input type="range" id="inputCurah" min="0" max="150" step="1" value="65">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span>Durasi Hujan (Jam)</span>
+          <span id="txtDurasi" style="color: #38bdf8;">5 Jam</span>
+        </div>
+        <input type="range" id="inputDurasi" min="0" max="12" step="0.5" value="5">
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-top: 6px;">
+        <button class="btn" id="btnPlayStorm" style="flex: 1;">▶ Putar Skenario Badai</button>
+        <button class="btn btn-secondary" id="btnReset">Reset</button>
+      </div>
+    </div>
+
+    <!-- Hasil Fuzzy Mamdani -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="font-size: 12px; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Output Fuzzy Global</span>
+        <span id="badgeGlobal" class="badge badge-siaga">SIAGA</span>
+      </div>
+      <div style="font-size: 32px; font-weight: 800; color: #38bdf8;" id="txtCrispZ">65.0%</div>
+      <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;" id="txtFiredRules">Rule aktif: R8 (Lebat & Sedang -> Siaga)</div>
+    </div>
+
+    <!-- Zonasi SBL -->
+    <div class="card">
+      <div style="font-weight: 700; font-size: 14px; margin-bottom: 8px; color: #e2e8f0;">📍 Skor Bahaya Lokal (SBL) Tiap Zona</div>
+      
+      <div class="zone-row">
+        <div>
+          <div style="font-weight: 600;">Bantaran Sungai Rahong</div>
+          <div style="font-size: 11px; color: #94a3b8;">Koef: 1.25 | Elevasi: 45m</div>
+        </div>
+        <div id="z1Badge" class="badge badge-awas">AWAS (81.3)</div>
+      </div>
+
+      <div class="zone-row">
+        <div>
+          <div style="font-weight: 600;">Permukiman Inti Desa</div>
+          <div style="font-size: 11px; color: #94a3b8;">Koef: 1.00 | Elevasi: 85m</div>
+        </div>
+        <div id="z2Badge" class="badge badge-siaga">SIAGA (65.0)</div>
+      </div>
+
+      <div class="zone-row">
+        <div>
+          <div style="font-weight: 600;">Bukit Harapan (Posko)</div>
+          <div style="font-size: 11px; color: #94a3b8;">Koef: 0.70 | Elevasi: 150m</div>
+        </div>
+        <div id="z3Badge" class="badge badge-waspada">WASPADA (45.5)</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <script>
+    // --- 1. INISIALISASI PETA LEAFLET ---
+    const map = L.map('map').setView([-6.8495, 106.7505], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // --- 2. DATA SPASIAL DESA RAHONG ---
+    const zonesData = [
+      {
+        id: "z1",
+        nama: "Bantaran Sungai Rahong",
+        koef: 1.25,
+        coords: [
+          [-6.8530, 106.7460], [-6.8530, 106.7480], [-6.8510, 106.7490],
+          [-6.8490, 106.7485], [-6.8485, 106.7470], [-6.8495, 106.7455],
+          [-6.8515, 106.7450], [-6.8530, 106.7460]
+        ]
+      },
+      {
+        id: "z2",
+        nama: "Permukiman Inti Desa",
+        koef: 1.00,
+        coords: [
+          [-6.8480, 106.7495], [-6.8475, 106.7530], [-6.8460, 106.7540],
+          [-6.8440, 106.7535], [-6.8435, 106.7510], [-6.8450, 106.7490],
+          [-6.8470, 106.7485], [-6.8480, 106.7495]
+        ]
+      },
+      {
+        id: "z3",
+        nama: "Bukit Harapan (Posko)",
+        koef: 0.70,
+        coords: [
+          [-6.8435, 106.7515], [-6.8425, 106.7545], [-6.8405, 106.7550],
+          [-6.8390, 106.7530], [-6.8400, 106.7505], [-6.8420, 106.7500],
+          [-6.8435, 106.7515]
+        ]
+      }
+    ];
+
+    const polygons = {};
+    zonesData.forEach(z => {
+      polygons[z.id] = L.polygon(z.coords, {
+        color: '#22c55e',
+        fillColor: '#22c55e',
+        fillOpacity: 0.45,
+        weight: 3
+      }).addTo(map).bindPopup(`<b>${z.nama}</b><br>Koefisien Spasial: ${z.koef}`);
+    });
+
+    // Garis Sungai
+    const riverCoords = [
+      [-6.8550, 106.7440], [-6.8520, 106.7460], [-6.8490, 106.7475],
+      [-6.8460, 106.7490], [-6.8430, 106.7500], [-6.8400, 106.7510]
+    ];
+    L.polyline(riverCoords, { color: '#0284c7', weight: 6, opacity: 0.9 }).addTo(map).bindPopup("<b>Sungai Rahong</b>");
+
+    // Titik Posko Evakuasi
+    L.marker([-6.8410, 106.7530]).addTo(map).bindPopup("<b>Posko Balai Desa Rahong</b><br>Kapasitas: 250 Jiwa (Zona Aman)");
+    L.marker([-6.8420, 106.7540]).addTo(map).bindPopup("<b>Posko Masjid Al-Ikhlas</b><br>Kapasitas: 150 Jiwa (Zona Aman)");
+
+    // --- 3. FUZZY LOGIC MAMDANI ---
+    function trapezoid(x, a, b, c, d) {
+      if (x <= a || x >= d) return 0.0;
+      if (a < x && x < b) return b !== a ? (x - a) / (b - a) : 1.0;
+      if (b <= x && x <= c) return 1.0;
+      if (c < x && x < d) return d !== c ? (d - x) / (d - c) : 1.0;
+      return 0.0;
+    }
+
+    function triangle(x, a, b, c) {
+      if (x <= a || x >= c) return 0.0;
+      if (a < x && x <= b) return b !== a ? (x - a) / (b - a) : 1.0;
+      if (b < x && x < c) return c !== b ? (c - x) / (c - b) : 1.0;
+      return 0.0;
+    }
+
+    const BAHAYA_MF = {
+      Aman: (z) => trapezoid(z, 0, 0, 20, 35),
+      Waspada: (z) => triangle(z, 25, 45, 60),
+      Siaga: (z) => triangle(z, 50, 65, 80),
+      Awas: (z) => trapezoid(z, 70, 85, 100, 100),
+    };
+
+    const RULES = [
+      { id: "R1", c: "Rendah", d: "Singkat", out: "Aman", desc: "Rendah & Singkat" },
+      { id: "R2", c: "Rendah", d: "Sedang",  out: "Aman", desc: "Rendah & Sedang" },
+      { id: "R3", c: "Rendah", d: "Lama",    out: "Waspada", desc: "Rendah & Lama" },
+      { id: "R4", c: "Sedang", d: "Singkat", out: "Aman", desc: "Sedang & Singkat" },
+      { id: "R5", c: "Sedang", d: "Sedang",  out: "Waspada", desc: "Sedang & Sedang" },
+      { id: "R6", c: "Sedang", d: "Lama",    out: "Siaga", desc: "Sedang & Lama" },
+      { id: "R7", c: "Lebat",  d: "Singkat", out: "Waspada", desc: "Lebat & Singkat" },
+      { id: "R8", c: "Lebat",  d: "Sedang",  out: "Siaga", desc: "Lebat & Sedang" },
+      { id: "R9", c: "Lebat",  d: "Lama",    out: "Awas", desc: "Lebat & Lama" },
+      { id: "R10", c: "Sangat Lebat", d: "Singkat", out: "Siaga", desc: "Sangat Lebat & Singkat" },
+      { id: "R11", c: "Sangat Lebat", d: "Sedang",  out: "Awas", desc: "Sangat Lebat & Sedang" },
+      { id: "R12", c: "Sangat Lebat", d: "Lama",    out: "Awas", desc: "Sangat Lebat & Lama" },
+    ];
+
+    function evaluateFuzzy(curah, durasi) {
+      const fCurah = {
+        Rendah: trapezoid(curah, 0, 0, 10, 25),
+        Sedang: triangle(curah, 15, 35, 55),
+        Lebat: triangle(curah, 45, 75, 105),
+        "Sangat Lebat": trapezoid(curah, 90, 120, 150, 150),
+      };
+      const fDurasi = {
+        Singkat: trapezoid(durasi, 0, 0, 1, 3),
+        Sedang: triangle(durasi, 2, 4, 6),
+        Lama: trapezoid(durasi, 5, 7, 12, 12),
+      };
+
+      const fired = [];
+      RULES.forEach(r => {
+        const s = Math.min(fCurah[r.c] || 0, fDurasi[r.d] || 0);
+        if (s > 0) fired.push({ id: r.id, desc: r.desc, out: r.out, s });
+      });
+
+      let num = 0, den = 0;
+      for (let i = 0; i <= 200; i++) {
+        const z = i * 0.5;
+        let muAgg = 0;
+        fired.forEach(fr => {
+          const m = Math.min(fr.s, BAHAYA_MF[fr.out](z));
+          if (m > muAgg) muAgg = m;
+        });
+        num += z * muAgg;
+        den += muAgg;
+      }
+      const crispZ = den > 0 ? num / den : 0;
+      return { crispZ, fired };
+    }
+
+    function getStatusAndColor(score) {
+      if (score > 80) return { label: "AWAS", color: "#ef4444", class: "badge-awas" };
+      if (score > 60) return { label: "SIAGA", color: "#f97316", class: "badge-siaga" };
+      if (score > 35) return { label: "WASPADA", color: "#eab308", class: "badge-waspada" };
+      return { label: "AMAN", color: "#22c55e", class: "badge-aman" };
+    }
+
+    function update() {
+      const curah = parseFloat(document.getElementById('inputCurah').value);
+      const durasi = parseFloat(document.getElementById('inputDurasi').value);
+
+      document.getElementById('txtCurah').innerText = curah + " mm";
+      document.getElementById('txtDurasi').innerText = durasi + " Jam";
+
+      const { crispZ, fired } = evaluateFuzzy(curah, durasi);
+      const globalStatus = getStatusAndColor(crispZ);
+
+      document.getElementById('txtCrispZ').innerText = crispZ.toFixed(1) + "%";
+      const badgeG = document.getElementById('badgeGlobal');
+      badgeG.innerText = globalStatus.label;
+      badgeG.className = "badge " + globalStatus.class;
+
+      document.getElementById('txtFiredRules').innerText = "Rule: " + fired.map(f => `${f.id} (${f.desc})`).join(", ");
+
+      // Update per zona
+      const zElements = [document.getElementById('z1Badge'), document.getElementById('z2Badge'), document.getElementById('z3Badge')];
+      let maxStatus = "AMAN";
+      let worstZone = "";
+
+      zonesData.forEach((z, i) => {
+        const sbl = Math.min(100, crispZ * z.koef);
+        const st = getStatusAndColor(sbl);
+        zElements[i].innerText = `${st.label} (${sbl.toFixed(1)})`;
+        zElements[i].className = "badge " + st.class;
+
+        polygons[z.id].setStyle({
+          color: st.color,
+          fillColor: st.color
+        });
+
+        if (st.label === "AWAS") { maxStatus = "AWAS"; worstZone = z.nama; }
+        else if (st.label === "SIAGA" && maxStatus !== "AWAS") { maxStatus = "SIAGA"; worstZone = z.nama; }
+      });
+
+      // Update Emergency Banner
+      const banner = document.getElementById('alertBanner');
+      if (maxStatus === "AWAS") {
+        banner.style.display = "block";
+        banner.style.background = "#ef4444";
+        banner.innerHTML = `🚨 <b>PERINGATAN DARURAT: STATUS AWAS!</b><br>Zona ${worstZone} terancam banjir besar. Warga segera evakuasi ke Posko Balai Desa Rahong.`;
+      } else if (maxStatus === "SIAGA") {
+        banner.style.display = "block";
+        banner.style.background = "#f97316";
+        banner.innerHTML = `⚠️ <b>PERINGATAN: STATUS SIAGA!</b><br>Potensi luapan sungai di ${worstZone}. Amankan dokumen berharga.`;
+      } else {
+        banner.style.display = "none";
+      }
+    }
+
+    document.getElementById('inputCurah').addEventListener('input', update);
+    document.getElementById('inputDurasi').addEventListener('input', update);
+
+    document.getElementById('btnReset').addEventListener('click', () => {
+      document.getElementById('inputCurah').value = 10;
+      document.getElementById('inputDurasi').value = 1;
+      update();
+    });
+
+    // Simulasi Otomatis Badai
+    document.getElementById('btnPlayStorm').addEventListener('click', () => {
+      const steps = [
+        { c: 5, d: 0.5 }, { c: 25, d: 1.5 }, { c: 55, d: 3.5 },
+        { c: 90, d: 6.0 }, { c: 130, d: 8.5 }, { c: 30, d: 2.0 }
+      ];
+      let idx = 0;
+      const interval = setInterval(() => {
+        if (idx >= steps.length) {
+          clearInterval(interval);
+          return;
+        }
+        document.getElementById('inputCurah').value = steps[idx].c;
+        document.getElementById('inputDurasi').value = steps[idx].d;
+        update();
+        idx++;
+      }, 1500);
+    });
+
+    update();
+  </script>
+</body>
+</html>
+

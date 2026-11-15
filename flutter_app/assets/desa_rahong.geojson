@@ -1,0 +1,228 @@
+{
+  "type": "FeatureCollection",
+  "name": "Desa Rahong - Spatial Data",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:EPSG::4326"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [106.7460, -6.8530],
+            [106.7480, -6.8530],
+            [106.7490, -6.8510],
+            [106.7485, -6.8490],
+            [106.7470, -6.8485],
+            [106.7455, -6.8495],
+            [106.7450, -6.8515],
+            [106.7460, -6.8530]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "zona-01",
+        "nama": "Bantaran Sungai Rahong",
+        "tipe": "zona",
+        "kategori_rawan": "Tinggi",
+        "koefisien_spasial": 1.25,
+        "elevasi": 45,
+        "deskripsi": "Zona bantaran sungai dengan risiko banjir tinggi. Area ini berada di tepi Sungai Rahong dan sering mengalami genangan saat hujan lebat. Penduduk di zona ini harus segera mengungsi jika status Siaga dikeluarkan.",
+        "warna_default": "#E53E3E",
+        "luas_ha": 3.2,
+        "jumlah_kk": 45
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [106.7495, -6.8480],
+            [106.7530, -6.8475],
+            [106.7540, -6.8460],
+            [106.7535, -6.8440],
+            [106.7515, -6.8435],
+            [106.7495, -6.8445],
+            [106.7490, -6.8465],
+            [106.7495, -6.8480]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "zona-02",
+        "nama": "Permukiman Inti Desa",
+        "tipe": "zona",
+        "kategori_rawan": "Sedang",
+        "koefisien_spasial": 1.00,
+        "elevasi": 85,
+        "deskripsi": "Zona permukiman utama Desa Rahong. Area ini memiliki risiko sedang karena elevasi cukup tinggi namun masih bisa terdampak jika terjadi banjir besar. Terdapat jaringan drainase desa di zona ini.",
+        "warna_default": "#ECC94B",
+        "luas_ha": 5.8,
+        "jumlah_kk": 120
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [106.7545, -6.8430],
+            [106.7575, -6.8425],
+            [106.7580, -6.8405],
+            [106.7570, -6.8390],
+            [106.7550, -6.8385],
+            [106.7540, -6.8400],
+            [106.7538, -6.8420],
+            [106.7545, -6.8430]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "zona-03",
+        "nama": "Bukit Harapan",
+        "tipe": "zona",
+        "kategori_rawan": "Aman",
+        "koefisien_spasial": 0.70,
+        "elevasi": 150,
+        "deskripsi": "Zona aman dan titik evakuasi utama. Area perbukitan di sebelah timur desa dengan elevasi tinggi. Dijadikan lokasi evakuasi saat banjir besar. Terdapat lapangan terbuka dan akses jalan yang baik.",
+        "warna_default": "#38A169",
+        "luas_ha": 4.5,
+        "jumlah_kk": 25
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.7430, -6.8550],
+          [106.7445, -6.8535],
+          [106.7460, -6.8520],
+          [106.7468, -6.8510],
+          [106.7475, -6.8500],
+          [106.7478, -6.8490],
+          [106.7480, -6.8475],
+          [106.7483, -6.8460],
+          [106.7488, -6.8445],
+          [106.7492, -6.8430],
+          [106.7500, -6.8410]
+        ]
+      },
+      "properties": {
+        "id": "sungai-01",
+        "nama": "Aliran Sungai Rahong",
+        "tipe": "sungai",
+        "koefisien_spasial": null,
+        "elevasi": null,
+        "deskripsi": "Sungai utama yang melintasi Desa Rahong dari selatan ke utara. Lebar rata-rata 8 meter dengan kedalaman normal 1.5 meter. Debit meningkat drastis saat musim hujan.",
+        "warna_default": "#3182CE",
+        "lebar_rata_rata_m": 8,
+        "kedalaman_normal_m": 1.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.7510, -6.8460]
+      },
+      "properties": {
+        "id": "posko-01",
+        "nama": "Balai Desa Rahong",
+        "tipe": "posko_evakuasi",
+        "koefisien_spasial": null,
+        "elevasi": 90,
+        "deskripsi": "Posko evakuasi utama di Balai Desa. Kapasitas tampung 200 orang. Tersedia logistik darurat, P3K, dan genset cadangan.",
+        "warna_default": "#805AD5",
+        "kapasitas_orang": 200,
+        "fasilitas": ["logistik", "P3K", "genset", "dapur_umum"]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.7520, -6.8450]
+      },
+      "properties": {
+        "id": "posko-02",
+        "nama": "Masjid Al-Ikhlas",
+        "tipe": "posko_evakuasi",
+        "koefisien_spasial": null,
+        "elevasi": 88,
+        "deskripsi": "Posko evakuasi sekunder di Masjid Al-Ikhlas. Kapasitas tampung 150 orang. Tersedia MCK dan area istirahat.",
+        "warna_default": "#805AD5",
+        "kapasitas_orang": 150,
+        "fasilitas": ["MCK", "area_istirahat", "dapur_umum"]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.7555, -6.8410]
+      },
+      "properties": {
+        "id": "posko-03",
+        "nama": "SD Negeri 1 Rahong",
+        "tipe": "posko_evakuasi",
+        "koefisien_spasial": null,
+        "elevasi": 130,
+        "deskripsi": "Posko evakuasi di SD Negeri 1 Rahong, terletak di area Bukit Harapan. Kapasitas tampung 100 orang. Lokasi paling aman dengan elevasi tinggi.",
+        "warna_default": "#805AD5",
+        "kapasitas_orang": 100,
+        "fasilitas": ["ruang_kelas", "lapangan", "MCK"]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.7465, -6.8515]
+      },
+      "properties": {
+        "id": "genangan-01",
+        "nama": "Titik Genangan Jembatan Lama",
+        "tipe": "titik_genangan",
+        "koefisien_spasial": null,
+        "elevasi": 42,
+        "deskripsi": "Titik genangan historis di sekitar jembatan lama. Banjir terakhir terjadi pada Februari 2024 dengan ketinggian air 80 cm. Area ini selalu menjadi titik pertama yang tergenang.",
+        "warna_default": "#FC8181",
+        "riwayat_banjir": [
+          {"tanggal": "2024-02-15", "ketinggian_cm": 80},
+          {"tanggal": "2023-12-28", "ketinggian_cm": 55},
+          {"tanggal": "2023-01-10", "ketinggian_cm": 120}
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.7473, -6.8498]
+      },
+      "properties": {
+        "id": "genangan-02",
+        "nama": "Titik Genangan Sawah Bawah",
+        "tipe": "titik_genangan",
+        "koefisien_spasial": null,
+        "elevasi": 48,
+        "deskripsi": "Titik genangan historis di area persawahan bagian bawah desa. Sering tergenang saat sungai meluap. Kerusakan lahan pertanian terakhir mencapai 2 hektar.",
+        "warna_default": "#FC8181",
+        "riwayat_banjir": [
+          {"tanggal": "2024-02-15", "ketinggian_cm": 60},
+          {"tanggal": "2023-12-28", "ketinggian_cm": 40},
+          {"tanggal": "2022-03-05", "ketinggian_cm": 95}
+        ]
+      }
+    }
+  ]
+}

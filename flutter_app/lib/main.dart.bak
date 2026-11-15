@@ -1,0 +1,48 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'core/constants/app_colors.dart';
+import 'core/utils/notification_helper.dart';
+import 'presentation/providers/flood_provider.dart';
+import 'presentation/screens/main_navigation_screen.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inisialisasi channel notifikasi lokal
+  try {
+    await NotificationHelper.initialize();
+  } catch (_) {}
+
+  runApp(const FloodWarningApp());
+}
+
+class FloodWarningApp extends StatelessWidget {
+  const FloodWarningApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => FloodProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Peringatan Banjir Desa Rahong',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: AppColors.backgroundDark,
+          colorScheme: const ColorScheme.dark(
+            primary: AppColors.primaryBlue,
+            surface: AppColors.surfaceDark,
+            background: AppColors.backgroundDark,
+          ),
+          fontFamily: 'Roboto',
+        ),
+        home: const MainNavigationScreen(),
+      ),
+    );
+  }
+}
+

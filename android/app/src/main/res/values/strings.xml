@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Peringatan Banjir Rahong</string>
+    <string name="title_dashboard">Dashboard Pemantauan</string>
+    <string name="title_map">Peta Risiko Banjir</string>
+    <string name="title_weather">Kondisi Cuaca Terkini</string>
+    <string name="title_fuzzy_analysis">Analisis Fuzzy Mamdani</string>
+    <string name="title_zone_status">Status Zonasi Desa Rahong</string>
+    <string name="label_rainfall">Curah Hujan (mm)</string>
+    <string name="label_duration">Durasi Hujan (Jam)</string>
+    <string name="label_sbl_score">Skor Bahaya Lokal (SBL)</string>
+    <string name="label_alert_level">Tingkat Bahaya</string>
+    <string name="action_evacuate">Jalur Evakuasi Darurat</string>
+    <string name="channel_emergency_name">Peringatan Darurat Banjir</string>
+    <string name="channel_emergency_desc">Notifikasi darurat status Siaga dan Awas banjir Desa Rahong</string>
+    <string name="channel_info_name">Informasi Cuaca &amp; Banjir</string>
+    <string name="channel_info_desc">Notifikasi reguler informasi cuaca dan status banjir Desa Rahong</string>
+</resources>
+
